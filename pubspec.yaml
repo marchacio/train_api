@@ -1,8 +1,8 @@
 name: train_api
-description: A new Flutter package project.
+description: Get train travel, status, stations and more
 version: 0.0.1
-author:
-homepage:
+author: Marchacio<marchacio03@gmail.com>
+homepage: https://github.com/marchacio/train_api.git
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
