@@ -17,3 +17,48 @@ class Station {
   @override
   String toString() => "$name,$id";  
 }
+
+
+class StationDetails extends Station {
+
+  DateTime partenzaTeorica;
+  DateTime arrivoTeorico;
+
+  DateTime partenzaReale;
+  DateTime arrivoReale;
+
+  int ritardoPartenza;
+  int ritardoArrivo;
+
+  int numeroStazioneDelTreno; //Es: la prima = 1, la seconda = 2...
+
+  String binarioProgrammatoArrivoDescrizione;
+  String binarioEffettivoArrivoDescrizione;
+  String binarioEffettivoPartenzaDescrizione;
+  String binarioProgrammatoPartenzaDescrizione;
+
+  StationDetails({
+    @required String id,
+    @required String name,
+
+    this.partenzaTeorica,
+    this.arrivoTeorico,
+    this.partenzaReale,
+    this.arrivoReale,
+
+    this.ritardoPartenza,
+    this.ritardoArrivo,
+
+    this.numeroStazioneDelTreno,
+    
+    this.binarioProgrammatoArrivoDescrizione,
+    this.binarioEffettivoArrivoDescrizione,
+    this.binarioEffettivoPartenzaDescrizione,
+    this.binarioProgrammatoPartenzaDescrizione,
+
+  }) : super(
+    id: id,
+    name: name,
+  );
+
+}

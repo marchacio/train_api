@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:train_api/Classes/Route.dart' as myRoute;
 import 'package:train_api/Classes/Station.dart';
 import 'package:train_api/train_api.dart';
 
@@ -89,9 +90,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: ListView.builder(
                             itemCount: listRoutes.length,
                             itemBuilder: (context, n) => ListTile(
-                              title: Text(listRoutes[n].trainList.toString()),
-                              trailing: Text(listRoutes[n].duration),
-                              subtitle: Text(listRoutes[n].toString())
+                              title: Text(listRoutes[n].startStation.name + ' -> ' + listRoutes[n].endStation.name),
+                              trailing: Text(listRoutes[n].duration + ' min'),
+                              subtitle: Text(listRoutes[n].trainList.length.toString() + ' cambi'),
+                              onTap: () => Navigator.push(context, MaterialPageRoute(builder: 
+                                (context) => _DetailsScreen(route: listRoutes[n]))),
                             )
                           ),
                         )
@@ -131,4 +134,51 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+
+
+
+class _DetailsScreen extends StatefulWidget {
+
+  final myRoute.Route route;
+  _DetailsScreen({@required this.route});
+
+  @override
+  __DetailsScreenState createState() => __DetailsScreenState();
+}
+
+class __DetailsScreenState extends State<_DetailsScreen> {
+
+  @override
+  void initState() { 
+    super.initState();
+    
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: Text('Detail route screen')),
+    body: CustomScrollView(
+      slivers: <Widget>[
+        SliverList(delegate: SliverChildListDelegate([
+          Text(widget.route.startStation.name, textAlign: TextAlign.center),
+          Text('|', textAlign: TextAlign.center),
+          Text(widget.route.endStation.name, textAlign: TextAlign.center),
+
+          Divider(),
+
+          Text('Train changes (${widget.route.trainList.length})', textScaleFactor: 1.5, textAlign: TextAlign.center),
+        ])),
+
+        SliverList(delegate: SliverChildBuilderDelegate(
+          (context, n) => ListTile(
+            title: Text(widget.route.trainList[n].startStationName + ' -> ' + widget.route.trainList[n].endStationName),
+            onTap: () async => await TrainApi.getTrainDetails(widget.route.trainList[n]),
+          ),
+          childCount: widget.route.trainList.length,
+        ))
+      ],
+    ),
+  );
 }

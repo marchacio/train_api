@@ -52,8 +52,8 @@ class TrainApi {
       List<Train> _trainList = List.generate(
         List.from(element['vehicles']).length, 
         (index) => Train(
-          startStation: element['vehicles'][index]['origine'],
-          endStation: element['vehicles'][index]['destinazione'],
+          startStationName: element['vehicles'][index]['origine'],
+          endStationName: element['vehicles'][index]['destinazione'],
           startDate: CustomDateFormat.dateTimeFromString(element['vehicles'][index]['orarioPartenza'].toString()),
           endDate: CustomDateFormat.dateTimeFromString(element['vehicles'][index]['orarioArrivo'].toString()),
           category: element['vehicles'][index]['categoriaDescrizione'],
@@ -70,6 +70,54 @@ class TrainApi {
     });
 
     return _listRoutes;
+  }
+
+
+  static Future<TrainDetails> getTrainDetails(Train train) async {
+
+    //Get the station id (needed for next step)
+    http.Response response = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/${train.trainNumber}');
+    String idStazionePartenza = response.body.trim().split('-').last;
+
+    //Get the effective train details
+    http.Response trainDetailsRaw = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/$idStazionePartenza/${train.trainNumber}');
+
+    try {
+      Map trainDetails = json.decode(trainDetailsRaw.body);
+
+      List<StationDetails> stationsDetails = List.generate(trainDetails['fermate'].length, (index) {
+        Map _details = trainDetails['fermate'][index];
+
+        return StationDetails(
+          id: _details['id'],
+          name: _details['stazione'],
+          arrivoReale: DateTime.fromMicrosecondsSinceEpoch(int.parse(_details['arrivoReale'])),
+          arrivoTeorico: DateTime.fromMicrosecondsSinceEpoch(int.parse(_details['arrivoTeorico'])),
+          binarioEffettivoArrivoDescrizione: _details['binarioEffettivoArrivoDescrizione'],
+          binarioEffettivoPartenzaDescrizione: _details['binarioEffettivoPartenzaDescrizione'],
+          binarioProgrammatoArrivoDescrizione: _details['binarioProgrammatoArrivoDescrizione'],
+          binarioProgrammatoPartenzaDescrizione: _details['binarioProgrammatoPartenzaDescrizione'],
+          numeroStazioneDelTreno: _details['numeroStazioneDelTreno'],
+          partenzaReale: _details['partenzaReale'],
+          partenzaTeorica: _details['partenzaTeorica'],
+          ritardoArrivo: _details['ritardoArrivo'],
+          ritardoPartenza: _details['ritardoPartenza'],
+        );
+      });
+
+      TrainDetails details = train.toTrainDetailsWithOtherData(
+        delayMin: trainDetails['ritardo'],
+        categoria: trainDetails['categoria'],
+        categoriaDescr: trainDetails['compTipologiaTreno'],
+        detailedStationList: stationsDetails,
+      );
+
+      return details;
+
+    } catch (e) {
+      print('Error during json.decode: most of the time this means that the train id does not match any real train.\nCheck the train ID');
+      return null;
+    }
   }
 
 }
