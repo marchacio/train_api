@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:train_api/Classes/Station.dart';
+import 'package:train_api/train_api.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,6 +29,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  List<Station> listStations = [];
+
+  Station first, second;
+
+  TextEditingController controllerText = TextEditingController();
   
   @override
   Widget build(BuildContext context) {
@@ -34,13 +42,92 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            //TODO
-          ],
-        ),
+      body: CustomScrollView(
+        slivers: [
+
+          SliverList(delegate: SliverChildListDelegate([
+            Text(
+              ((first == null) ? ' . ' : first.name) 
+              + ' --> ' + 
+              ((second == null) ? ' . ' : second.name)
+            ),
+
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controllerText,
+                        decoration: InputDecoration(
+                          hintText: 'Station name'
+                        ),
+                        onSubmitted: (string) async {
+                          listStations = await TrainApi.returnStations(string);
+                          setState(() {});
+                        },
+                      ),
+                    ),
+
+                    IconButton(icon: Icon(Icons.search), onPressed: () async {
+                      listStations = await TrainApi.returnStations(controllerText.text);
+                      setState(() {});
+                    })
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  children: [
+                    Expanded(child: MaterialButton(
+                      color: Colors.grey.shade300,
+                      onPressed: () async => await TrainApi.returnRoutes(first, second, DateTime.now()).then((listRoutes) => showDialog(
+                        context: context,
+                        child: Dialog(
+                          child: ListView.builder(
+                            itemCount: listRoutes.length,
+                            itemBuilder: (context, n) => ListTile(
+                              title: Text(listRoutes[n].trainList.toString()),
+                              trailing: Text(listRoutes[n].duration),
+                              subtitle: Text(listRoutes[n].toString())
+                            )
+                          ),
+                        )
+                      )),
+                      child: Text('Get routes now')
+                    ),),
+                    Expanded(child: MaterialButton(
+                      color: Colors.grey.shade300,
+                      onPressed: () => setState(() {
+                        first = null;
+                        second = null;
+                      }),
+                      child: Text('Clear selected stations')
+                    )),
+                  ],
+                ),
+              )
+            ])
+          ),
+
+          SliverList(delegate: SliverChildBuilderDelegate(
+            (context, n) => ListTile(
+              title: Text(listStations[n].name),
+              subtitle: Text(listStations[n].id),
+              onTap: () => setState(() {
+                if(first == null) {
+                  first = listStations[n];
+                } else if(second == null) {
+                  second = listStations[n];
+                }
+              }),
+            ),
+            childCount: listStations.length,
+          ))
+
+        ],
       ),
     );
   }
