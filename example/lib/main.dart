@@ -64,14 +64,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           hintText: 'Station name'
                         ),
                         onSubmitted: (string) async {
-                          listStations = await TrainApi.returnStations(string);
+                          listStations = await TrainApi.getStations(string);
                           setState(() {});
                         },
                       ),
                     ),
 
                     IconButton(icon: Icon(Icons.search), onPressed: () async {
-                      listStations = await TrainApi.returnStations(controllerText.text);
+                      listStations = await TrainApi.getStations(controllerText.text);
                       setState(() {});
                     })
                   ],
@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     Expanded(child: MaterialButton(
                       color: Colors.grey.shade300,
-                      onPressed: () async => await TrainApi.returnRoutes(first, second, DateTime.now()).then((listRoutes) => showDialog(
+                      onPressed: () async => await TrainApi.getRoutes(first, second, DateTime.now()).then((listRoutes) => showDialog(
                         context: context,
                         child: Dialog(
                           child: ListView.builder(

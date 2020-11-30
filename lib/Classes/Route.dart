@@ -19,4 +19,8 @@ class Route {
     @required this.trainList,
   });
 
+
+  DateTime get startDateTime => trainList[0].startDate;
+  DateTime get endDateTime => trainList.last.endDate;
+
 }

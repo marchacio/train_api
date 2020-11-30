@@ -10,7 +10,7 @@ class TrainApi {
 
 
   ///Returns stations whose name begins with the given string
-  static Future<List<Station>> returnStations(String stationName) async {
+  static Future<List<Station>> getStations(String stationName) async {
     http.Response response = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/autocompletaStazione/$stationName');
     //Trenitalia: https://www.lefrecce.it/msite/api/solutions?origin=roma%20termini&destination=cesena&arflag=A&adate=30/01/2021&atime=08&adultno=1&childno=0&direction=A&frecce=false&onlyRegional=false
 
@@ -33,7 +33,7 @@ class TrainApi {
   }
 
 
-  static Future<List<Route>> returnRoutes(Station startStation, Station endStation, DateTime date) async {
+  static Future<List<Route>> getRoutes(Station startStation, Station endStation, DateTime date) async {
 
     ///Get info from online server as Map (`json.decode(...)`)
     http.Response response = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/${startStation.idWithoutPrefix}/${endStation.idWithoutPrefix}/'
@@ -45,6 +45,8 @@ class TrainApi {
 
     //For each travel solution, create a route
     List.from(body['soluzioni']).forEach((element) {
+
+      print(element);
 
       //Create the train list (this has length == 1 if there are no train change)
       //
@@ -91,8 +93,8 @@ class TrainApi {
         return StationDetails(
           id: _details['id'],
           name: _details['stazione'],
-          arrivoReale: DateTime.fromMicrosecondsSinceEpoch(int.parse(_details['arrivoReale'])),
-          arrivoTeorico: DateTime.fromMicrosecondsSinceEpoch(int.parse(_details['arrivoTeorico'])),
+          arrivoReale: (_details['arrivoReale'] != null) ? DateTime.fromMicrosecondsSinceEpoch(int.parse(_details['arrivoReale'])) : null,
+          arrivoTeorico: (_details['arrivoTeorico'] != null) ? DateTime.fromMicrosecondsSinceEpoch(int.parse(_details['arrivoTeorico'])) : null,
           binarioEffettivoArrivoDescrizione: _details['binarioEffettivoArrivoDescrizione'],
           binarioEffettivoPartenzaDescrizione: _details['binarioEffettivoPartenzaDescrizione'],
           binarioProgrammatoArrivoDescrizione: _details['binarioProgrammatoArrivoDescrizione'],
@@ -115,6 +117,7 @@ class TrainApi {
       return details;
 
     } catch (e) {
+      print(e);
       print('Error during json.decode: most of the time this means that the train id does not match any real train.\nCheck the train ID');
       return null;
     }
