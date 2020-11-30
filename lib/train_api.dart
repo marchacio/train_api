@@ -86,8 +86,9 @@ class TrainApi {
     //Get the effective train details
     http.Response trainDetailsRaw = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/$idStazionePartenza/${train.trainNumber}');
 
-    try {
-      Map trainDetails = json.decode(trainDetailsRaw.body);
+
+
+    Map trainDetails = json.decode(trainDetailsRaw.body);
 
       List<StationDetails> stationsDetails = List.generate(trainDetails['fermate'].length, (index) {
         Map _details = trainDetails['fermate'][index];
@@ -95,15 +96,15 @@ class TrainApi {
         return StationDetails(
           id: _details['id'],
           name: _details['stazione'],
-          arrivoReale: (_details['arrivoReale'] != null) ? DateTime.fromMicrosecondsSinceEpoch(int.parse(_details['arrivoReale'])) : null,
-          arrivoTeorico: (_details['arrivoTeorico'] != null) ? DateTime.fromMicrosecondsSinceEpoch(int.parse(_details['arrivoTeorico'])) : null,
+          arrivoReale: (_details['arrivoReale'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['arrivoReale']) : null,
+          arrivoTeorico: (_details['arrivoTeorico'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['arrivoTeorico']) : null,
           binarioEffettivoArrivoDescrizione: _details['binarioEffettivoArrivoDescrizione'],
           binarioEffettivoPartenzaDescrizione: _details['binarioEffettivoPartenzaDescrizione'],
           binarioProgrammatoArrivoDescrizione: _details['binarioProgrammatoArrivoDescrizione'],
           binarioProgrammatoPartenzaDescrizione: _details['binarioProgrammatoPartenzaDescrizione'],
           numeroStazioneDelTreno: _details['numeroStazioneDelTreno'],
-          partenzaReale: _details['partenzaReale'],
-          partenzaTeorica: _details['partenzaTeorica'],
+          partenzaReale: (_details['partenzaReale'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['partenzaReale']) : null,
+          partenzaTeorica:(_details['partenzaTeorica'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['partenzaTeorica']) : null,
           ritardoArrivo: _details['ritardoArrivo'],
           ritardoPartenza: _details['ritardoPartenza'],
         );
@@ -117,6 +118,10 @@ class TrainApi {
       );
 
       return details;
+
+
+    try {
+      
 
     } catch (e) {
       print(e);

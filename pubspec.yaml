@@ -1,6 +1,6 @@
 name: train_api
 description: Get train travel, status, stations and more
-version: 0.0.3
+version: 0.0.5
 author: Marchacio<marchacio03@gmail.com>
 homepage: https://github.com/marchacio/train_api.git
 
