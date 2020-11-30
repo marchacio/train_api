@@ -12,6 +12,3 @@ Just call `TrainApi` class in your code and access to all static method like:
 * `TrainApi.getRoutes(Station start, Station end, DateTime date)` to get a list of routes to go from `start` Station to `end` Station at `date`
 * `TrainApi.getTrainDetails(Train train)` to get details about a `train` (obtained previously from `getRoutes`)
 
-```vega-lite
-
-```

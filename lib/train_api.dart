@@ -1,5 +1,7 @@
 library train_api;
 
+export 'package:train_api/Classes/ALL.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:train_api/Classes/ALL.dart';
 import 'dart:convert';
