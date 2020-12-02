@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:train_api/Classes/Route.dart' as myRoute;
 import 'package:train_api/Classes/Station.dart';
-import 'package:train_api/train_api.dart';
+import 'package:train_api/main.dart';
 
 void main() {
   runApp(MyApp());

@@ -1,12 +1,14 @@
 library train_api;
 
-export 'package:train_api/Classes/ALL.dart';
+export './Classes/ALL.dart';
+
+import 'package:train_api/Classes/Weather.dart';
+
+import './Classes/ALL.dart';
+import './Data/CustomDateFormat/CustomDateFormat.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:train_api/Classes/ALL.dart';
 import 'dart:convert';
-
-import 'package:train_api/Data/CustomDateFormat/CustomDateFormat.dart';
 
 class TrainApi {
 
@@ -130,5 +132,25 @@ class TrainApi {
       return null;
     }
   }
+
+
+  static Future<List<Weather>> getMeteoInfo() async {
+
+    http.Response response = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/datimeteo/0');
+
+    Map<String, dynamic> body = json.decode(response.body);
+
+    List<Weather> weatherList = List<Weather>.generate(body.keys.length, (index) => Weather.fromMap(body[body.keys.toList()[index]]));
+
+    return weatherList;
+  }
+
+  ///Return a link to display weather images
+  ///
+  ///EX:
+  /// * Cloudly: http://www.viaggiatreno.it/vt_static/img/legenda/meteo/108.png  ![](http://www.viaggiatreno.it/vt_static/img/legenda/meteo/108.png)
+  /// * Heavy rain: http://www.viaggiatreno.it/vt_static/img/legenda/meteo/113.png  ![](http://www.viaggiatreno.it/vt_static/img/legenda/meteo/113.png)
+  /// * Night light cloudly: http://www.viaggiatreno.it/vt_static/img/legenda/meteo/103.png  ![](http://www.viaggiatreno.it/vt_static/img/legenda/meteo/103.png)
+  static String getMeteoImageLinkFromInt(int _int) => 'http://www.viaggiatreno.it/vt_static/img/legenda/meteo/$_int.png';
 
 }
