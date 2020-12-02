@@ -48,7 +48,7 @@ class TrainApi {
     //For each travel solution, create a route
     List.from(body['soluzioni']).forEach((element) {
 
-      print(element);
+      print(element['vehicles'][0]['orarioPartenza']);
 
       //Create the train list (this has length == 1 if there are no train change)
       //
@@ -64,6 +64,8 @@ class TrainApi {
           trainNumber: element['vehicles'][index]['numeroTreno'],
         ));
 
+      print(_trainList[0].startDate);
+
       //Add this route to the main list that will be returned
       _listRoutes.add(Route(
         startStation: startStation, 
@@ -77,6 +79,7 @@ class TrainApi {
   }
 
 
+  ///Return details about a specific train
   static Future<TrainDetails> getTrainDetails(Train train) async {
 
     //Get the station id (needed for next step)
@@ -86,12 +89,14 @@ class TrainApi {
     //Get the effective train details
     http.Response trainDetailsRaw = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/$idStazionePartenza/${train.trainNumber}');
 
-
-
-    Map trainDetails = json.decode(trainDetailsRaw.body);
+    try {
+      
+      Map trainDetails = json.decode(trainDetailsRaw.body);
 
       List<StationDetails> stationsDetails = List.generate(trainDetails['fermate'].length, (index) {
         Map _details = trainDetails['fermate'][index];
+
+        print(_details);
 
         return StationDetails(
           id: _details['id'],
@@ -118,10 +123,6 @@ class TrainApi {
       );
 
       return details;
-
-
-    try {
-      
 
     } catch (e) {
       print(e);

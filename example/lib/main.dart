@@ -111,8 +111,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     )),
                   ],
                 ),
-              )
-            ])
+              ),
+            ]),
           ),
 
           SliverList(delegate: SliverChildBuilderDelegate(
