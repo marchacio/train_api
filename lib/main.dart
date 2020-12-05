@@ -2,6 +2,7 @@ library train_api;
 
 export './Classes/ALL.dart';
 
+import 'package:intl/intl.dart';
 import 'package:train_api/Classes/Weather.dart';
 
 import './Classes/ALL.dart';
@@ -153,4 +154,16 @@ class TrainApi {
   /// * Night light cloudly: http://www.viaggiatreno.it/vt_static/img/legenda/meteo/103.png  ![](http://www.viaggiatreno.it/vt_static/img/legenda/meteo/103.png)
   static String getMeteoImageLinkFromInt(int _int) => 'http://www.viaggiatreno.it/vt_static/img/legenda/meteo/$_int.png';
 
+
+  static Future<void> getStationListTrains() async {
+
+    http.Response response = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/partenze/S04702/'
+     + DateFormat('EEE%ddMMM%2002%202020%20HH:mm:ss').format(DateTime.now())); //'Wed%20Dec%2002%202020%2020:52:50');
+
+    List body = json.decode(response.body);
+    for (Map treno in body) {
+      print(treno);
+    }
+
+  }
 }

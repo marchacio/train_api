@@ -15,7 +15,14 @@ class Station {
   String get idWithoutPrefix => id.substring(2);
 
   @override
-  String toString() => "$name,$id";  
+  String toString() => "$name,$id";
+
+  @override
+  bool operator ==(other) => other.id == id && other.name == name;
+
+  @override
+  int get hashCode => super.hashCode;
+
 }
 
 

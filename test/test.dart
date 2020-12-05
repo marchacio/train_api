@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   
-  test('info meteo', () async {
+  test('test', () async {
 
-    await TrainApi.getMeteoInfo();
+    await TrainApi.getStationListTrains();
   });
 }
