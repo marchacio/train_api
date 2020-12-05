@@ -1,18 +1,17 @@
 library train_api;
 
-export './Classes/ALL.dart';
+export 'Classes/ALL.dart';
 
 import 'package:intl/intl.dart';
 import 'package:train_api/Classes/Weather.dart';
 
-import './Classes/ALL.dart';
-import './Data/CustomDateFormat/CustomDateFormat.dart';
+import 'Classes/ALL.dart';
+import 'Data/CustomDateFormat/CustomDateFormat.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class TrainApi {
-
 
   ///Returns stations whose name begins with the given string
   static Future<List<Station>> getStations(String stationName) async {
@@ -38,11 +37,12 @@ class TrainApi {
   }
 
 
+  ///Return a `List<Route>` with the possibile travels for the user
   static Future<List<Route>> getRoutes(Station startStation, Station endStation, DateTime date) async {
 
     ///Get info from online server as Map (`json.decode(...)`)
     http.Response response = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/${startStation.idWithoutPrefix}/${endStation.idWithoutPrefix}/'
-      + CustomDateFormat.stringFromDateTime(DateTime.now()));
+      + CustomDateFormat.stringFromDateTime(date));
     final body = json.decode(response.body);
 
     //This is the list that will be returned
@@ -51,8 +51,6 @@ class TrainApi {
     //For each travel solution, create a route
     List.from(body['soluzioni']).forEach((element) {
 
-      print(element['vehicles'][0]['orarioPartenza']);
-
       //Create the train list (this has length == 1 if there are no train change)
       //
       //If the route provides a change, the list will have a length other than 1
@@ -60,14 +58,12 @@ class TrainApi {
         List.from(element['vehicles']).length, 
         (index) => Train(
           startStationName: element['vehicles'][index]['origine'],
-          endStationName: element['vehicles'][index]['destinazione'],
+          arriveStationName: element['vehicles'][index]['destinazione'],
           startDate: CustomDateFormat.dateTimeFromString(element['vehicles'][index]['orarioPartenza'].toString()),
           endDate: CustomDateFormat.dateTimeFromString(element['vehicles'][index]['orarioArrivo'].toString()),
           category: element['vehicles'][index]['categoriaDescrizione'],
           trainNumber: element['vehicles'][index]['numeroTreno'],
         ));
-
-      print(_trainList[0].startDate);
 
       //Add this route to the main list that will be returned
       _listRoutes.add(Route(
@@ -83,6 +79,16 @@ class TrainApi {
 
 
   ///Return details about a specific train
+  ///
+  ///Require a `Train` object to get details (get the `Train` object with:
+  ///
+  ///```
+  ///List<Route> list = await TrainApi.getRoutes(...);
+  ///for(Route _route in list) {
+  ///   _route.trainList //====> this is a list of Train objects
+  ///}
+  ///``` 
+  ///
   static Future<TrainDetails> getTrainDetails(Train train) async {
 
     //Get the station id (needed for next step)
@@ -99,29 +105,26 @@ class TrainApi {
       List<StationDetails> stationsDetails = List.generate(trainDetails['fermate'].length, (index) {
         Map _details = trainDetails['fermate'][index];
 
-        print(_details);
-
         return StationDetails(
           id: _details['id'],
           name: _details['stazione'],
-          arrivoReale: (_details['arrivoReale'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['arrivoReale']) : null,
-          arrivoTeorico: (_details['arrivoTeorico'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['arrivoTeorico']) : null,
-          binarioEffettivoArrivoDescrizione: _details['binarioEffettivoArrivoDescrizione'],
-          binarioEffettivoPartenzaDescrizione: _details['binarioEffettivoPartenzaDescrizione'],
-          binarioProgrammatoArrivoDescrizione: _details['binarioProgrammatoArrivoDescrizione'],
-          binarioProgrammatoPartenzaDescrizione: _details['binarioProgrammatoPartenzaDescrizione'],
-          numeroStazioneDelTreno: _details['numeroStazioneDelTreno'],
-          partenzaReale: (_details['partenzaReale'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['partenzaReale']) : null,
-          partenzaTeorica:(_details['partenzaTeorica'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['partenzaTeorica']) : null,
-          ritardoArrivo: _details['ritardoArrivo'],
-          ritardoPartenza: _details['ritardoPartenza'],
+          realArrive: (_details['arrivoReale'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['arrivoReale']) : null,
+          scheduledArrive: (_details['arrivoTeorico'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['arrivoTeorico']) : null,
+          arrivalRealBinary: _details['binarioEffettivoArrivoDescrizione'],
+          departureRealBinary: _details['binarioEffettivoPartenzaDescrizione'],
+          arrivalScheduledBinary: _details['binarioProgrammatoArrivoDescrizione'],
+          departureScheduledBinary: _details['binarioProgrammatoPartenzaDescrizione'],
+          stationNumberOfTrainRoute: _details['numeroStazioneDelTreno'],
+          realDeparture: (_details['partenzaReale'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['partenzaReale']) : null,
+          scheduledDeparture:(_details['partenzaTeorica'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['partenzaTeorica']) : null,
+          delayArrive: _details['ritardoArrivo'],
+          delayDeparture: _details['ritardoPartenza'],
         );
       });
 
       TrainDetails details = train.toTrainDetailsWithOtherData(
-        delayMin: trainDetails['ritardo'],
-        categoria: trainDetails['categoria'],
-        categoriaDescr: trainDetails['compTipologiaTreno'],
+        delay: trainDetails['ritardo'],
+        categoryDescr: trainDetails['compTipologiaTreno'],
         detailedStationList: stationsDetails,
       );
 
@@ -135,6 +138,8 @@ class TrainApi {
   }
 
 
+  ///Return a `List<Weather>` with all weather informations of the most important italian stations
+  ///(ex: *Roma Termini*, *Torino Porta Nuova*, *Napoli Centrale*, *Milano Centrale*, *Genova Piazza Principe* and more...)
   static Future<List<Weather>> getMeteoInfo() async {
 
     http.Response response = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/datimeteo/0');
@@ -155,14 +160,39 @@ class TrainApi {
   static String getMeteoImageLinkFromInt(int _int) => 'http://www.viaggiatreno.it/vt_static/img/legenda/meteo/$_int.png';
 
 
+  //TODO
   static Future<void> getStationListTrains() async {
 
-    http.Response response = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/partenze/S04702/'
-     + DateFormat('EEE%ddMMM%2002%202020%20HH:mm:ss').format(DateTime.now())); //'Wed%20Dec%2002%202020%2020:52:50');
+    String url = 'http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/partenze/S04702/'
+     + DateFormat('EEE').format(DateTime.now()) + '%20' 
+     + DateFormat('MMM').format(DateTime.now()) + '%20' 
+     + DateFormat('dd').format(DateTime.now()) + '%20' 
+     + DateFormat('yyyy').format(DateTime.now()) + '%20'
+     + DateFormat('HH:mm:ss').format(DateTime.now());
+    http.Response response = await http.get(url);
 
     List body = json.decode(response.body);
+
+    List<TrainDetails> listaDettagliTreni = [];
+
     for (Map treno in body) {
-      print(treno);
+      print('-----------------------');
+      treno.forEach((key, value) {
+        if(value != null){
+          print('$key: $value');
+        }
+      });
+      listaDettagliTreni.add(TrainDetails(
+        startStationName: null, 
+        arriveStationName: treno['destinazione'].toString(), 
+        startDate: DateTime.fromMicrosecondsSinceEpoch(treno['orarioPartenza']),
+        endDate: null, 
+        category: treno['categoria'].toString(), 
+        trainNumber: treno['numeroTreno'].toString(),
+        categoryDescr: treno['categoriaDescrizione'].toString(),
+        delay: treno['ritardo'],
+
+      ));
     }
 
   }

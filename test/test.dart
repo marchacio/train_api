@@ -1,5 +1,5 @@
 
-import 'package:train_api/main.dart';
+import 'package:train_api/train_api.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 

@@ -28,40 +28,40 @@ class Station {
 
 class StationDetails extends Station {
 
-  DateTime partenzaTeorica;
-  DateTime arrivoTeorico;
+  DateTime scheduledDeparture;
+  DateTime scheduledArrive;
 
-  DateTime partenzaReale;
-  DateTime arrivoReale;
+  DateTime realDeparture;
+  DateTime realArrive;
 
-  int ritardoPartenza;
-  int ritardoArrivo;
+  int delayDeparture;
+  int delayArrive;
 
-  int numeroStazioneDelTreno; //Es: la prima = 1, la seconda = 2...
+  int stationNumberOfTrainRoute; //Es: la prima = 1, la seconda = 2...
 
-  String binarioProgrammatoArrivoDescrizione;
-  String binarioEffettivoArrivoDescrizione;
-  String binarioEffettivoPartenzaDescrizione;
-  String binarioProgrammatoPartenzaDescrizione;
+  String arrivalScheduledBinary;
+  String arrivalRealBinary;
+  String departureScheduledBinary;
+  String departureRealBinary;
 
   StationDetails({
     @required String id,
     @required String name,
 
-    this.partenzaTeorica,
-    this.arrivoTeorico,
-    this.partenzaReale,
-    this.arrivoReale,
+    this.scheduledArrive,
+    this.scheduledDeparture,
+    this.realDeparture,
+    this.realArrive,
 
-    this.ritardoPartenza,
-    this.ritardoArrivo,
+    this.delayDeparture,
+    this.delayArrive,
 
-    this.numeroStazioneDelTreno,
+    this.stationNumberOfTrainRoute,
     
-    this.binarioProgrammatoArrivoDescrizione,
-    this.binarioEffettivoArrivoDescrizione,
-    this.binarioEffettivoPartenzaDescrizione,
-    this.binarioProgrammatoPartenzaDescrizione,
+    this.arrivalScheduledBinary,
+    this.arrivalRealBinary,
+    this.departureScheduledBinary,
+    this.departureRealBinary,
 
   }) : super(
     id: id,

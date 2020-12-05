@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:train_api/Classes/Route.dart' as myRoute;
 import 'package:train_api/Classes/Station.dart';
-import 'package:train_api/main.dart';
+import 'package:train_api/train_api.dart';
 
 void main() {
   runApp(MyApp());
@@ -173,7 +173,7 @@ class __DetailsScreenState extends State<_DetailsScreen> {
 
         SliverList(delegate: SliverChildBuilderDelegate(
           (context, n) => ListTile(
-            title: Text(widget.route.trainList[n].startStationName + ' -> ' + widget.route.trainList[n].endStationName),
+            title: Text(widget.route.trainList[n].startStationName + ' -> ' + widget.route.trainList[n].arriveStationName),
             onTap: () async => await TrainApi.getTrainDetails(widget.route.trainList[n]),
           ),
           childCount: widget.route.trainList.length,

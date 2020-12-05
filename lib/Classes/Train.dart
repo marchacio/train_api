@@ -5,7 +5,7 @@ import 'package:train_api/Classes/Station.dart';
 class Train {
 
   String startStationName;
-  String endStationName;
+  String arriveStationName;
 
   DateTime startDate;
   DateTime endDate;
@@ -15,7 +15,7 @@ class Train {
 
   Train({
     @required this.startStationName,
-    @required this.endStationName,
+    @required this.arriveStationName,
 
     @required this.startDate,
     @required this.endDate,
@@ -26,21 +26,19 @@ class Train {
 
 
   TrainDetails toTrainDetailsWithOtherData({
-    @required int delayMin,
-    @required String categoria,
-    @required String categoriaDescr,
+    @required int delay,
+    @required String categoryDescr,
     @required List<StationDetails> detailedStationList
   }) => TrainDetails(
     startStationName: startStationName, 
-    endStationName: endStationName,
+    arriveStationName: arriveStationName,
     startDate: startDate,
     endDate: endDate,
     category: category,
     trainNumber: trainNumber,
 
-    delayMin: delayMin,
-    categoria: categoria,
-    categoriaDescr: categoriaDescr,
+    delay: delay,
+    categoryDescr: categoryDescr,
     detailedStationList: detailedStationList,
   );
 
@@ -49,14 +47,14 @@ class Train {
 
 class TrainDetails extends Train {
 
-  int delayMin;
-  String categoria, categoriaDescr;
+  int delay;
+  String categoryDescr;
 
   List<StationDetails> detailedStationList;
 
   TrainDetails({
     @required String startStationName,
-    @required String endStationName,
+    @required String arriveStationName,
 
     @required DateTime startDate,
     @required DateTime endDate,
@@ -64,15 +62,14 @@ class TrainDetails extends Train {
     @required String category,
     @required String trainNumber,
 
-    this.delayMin,
-    this.categoria,
-    this.categoriaDescr,
+    this.delay,
+    this.categoryDescr,
     this.detailedStationList,
 
   }) : super(
     category: category,
     endDate: endDate,
-    endStationName: endStationName,
+    arriveStationName: arriveStationName,
     startDate: startDate,
     startStationName: startStationName,
     trainNumber: trainNumber,
