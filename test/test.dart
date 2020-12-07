@@ -7,6 +7,6 @@ void main() {
   
   test('test', () async {
 
-    await TrainApi.getStationListTrains();
+    await TrainApi.getArriveStationListTrains(null);
   });
 }

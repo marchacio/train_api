@@ -2,14 +2,15 @@ library train_api;
 
 export 'Classes/ALL.dart';
 
-import 'package:intl/intl.dart';
-import 'package:train_api/Classes/Weather.dart';
 
 import 'Classes/ALL.dart';
 import 'Data/CustomDateFormat/CustomDateFormat.dart';
 
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+
 
 class TrainApi {
 
@@ -140,7 +141,7 @@ class TrainApi {
 
   ///Return a `List<Weather>` with all weather informations of the most important italian stations
   ///(ex: *Roma Termini*, *Torino Porta Nuova*, *Napoli Centrale*, *Milano Centrale*, *Genova Piazza Principe* and more...)
-  static Future<List<Weather>> getMeteoInfo() async {
+  static Future<List<Weather>> getWeatherInfo() async {
 
     http.Response response = await http.get('http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/datimeteo/0');
 
@@ -160,10 +161,12 @@ class TrainApi {
   static String getMeteoImageLinkFromInt(int _int) => 'http://www.viaggiatreno.it/vt_static/img/legenda/meteo/$_int.png';
 
 
-  //TODO
-  static Future<void> getStationListTrains() async {
+  ///Get a list of `DepartureTrain`.
+  ///
+  ///`DepartureTrain` is the class that contains all the data of trains departing from the given `station`
+  static Future<List<DepartureTrain>> getDepartureStationListTrains(Station station) async {
 
-    String url = 'http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/partenze/S04702/'
+    String url = 'http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/partenze/${station.id}/'
      + DateFormat('EEE').format(DateTime.now()) + '%20' 
      + DateFormat('MMM').format(DateTime.now()) + '%20' 
      + DateFormat('dd').format(DateTime.now()) + '%20' 
@@ -173,27 +176,27 @@ class TrainApi {
 
     List body = json.decode(response.body);
 
-    List<TrainDetails> listaDettagliTreni = [];
+    List<DepartureTrain> _list = List.generate(body.length, (index) => DepartureTrain.fromMap(body[index]));
 
-    for (Map treno in body) {
-      print('-----------------------');
-      treno.forEach((key, value) {
-        if(value != null){
-          print('$key: $value');
-        }
-      });
-      listaDettagliTreni.add(TrainDetails(
-        startStationName: null, 
-        arriveStationName: treno['destinazione'].toString(), 
-        startDate: DateTime.fromMicrosecondsSinceEpoch(treno['orarioPartenza']),
-        endDate: null, 
-        category: treno['categoria'].toString(), 
-        trainNumber: treno['numeroTreno'].toString(),
-        categoryDescr: treno['categoriaDescrizione'].toString(),
-        delay: treno['ritardo'],
+    return _list;
+  }
 
-      ));
-    }
 
+
+  static Future<List<ArriveTrain>> getArriveStationListTrains(Station station) async {
+
+    String url = 'http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/arrivi/S04702/'
+     + DateFormat('EEE').format(DateTime.now()) + '%20' 
+     + DateFormat('MMM').format(DateTime.now()) + '%20' 
+     + DateFormat('dd').format(DateTime.now()) + '%20' 
+     + DateFormat('yyyy').format(DateTime.now()) + '%20'
+     + DateFormat('HH:mm:ss').format(DateTime.now());
+    http.Response response = await http.get(url);
+
+    List body = json.decode(response.body);
+
+    List<ArriveTrain> _list = List.generate(body.length, (index) => ArriveTrain.fromMap(body[index]));
+
+    return _list;
   }
 }
