@@ -182,7 +182,9 @@ class TrainApi {
   }
 
 
-
+  ///Get a list of `ArriveTrain`.
+  ///
+  ///`ArriveTrain` is the class that contains all the data of trains arriving at the given `station`
   static Future<List<ArriveTrain>> getArriveStationListTrains(Station station) async {
 
     String url = 'http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/arrivi/${station.id}/'
@@ -195,7 +197,10 @@ class TrainApi {
 
     List body = json.decode(response.body);
 
-    List<ArriveTrain> _list = List.generate(body.length, (index) => ArriveTrain.fromMap(body[index]));
+    List<ArriveTrain> _list = List.generate(body.length, (index) {
+      print(body[index]);
+      return ArriveTrain.fromMap(body[index]);
+    });
 
     return _list;
   }
