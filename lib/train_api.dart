@@ -185,7 +185,7 @@ class TrainApi {
 
   static Future<List<ArriveTrain>> getArriveStationListTrains(Station station) async {
 
-    String url = 'http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/arrivi/S04702/'
+    String url = 'http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/arrivi/${station.id}/'
      + DateFormat('EEE').format(DateTime.now()) + '%20' 
      + DateFormat('MMM').format(DateTime.now()) + '%20' 
      + DateFormat('dd').format(DateTime.now()) + '%20' 

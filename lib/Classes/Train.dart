@@ -173,7 +173,7 @@ class ArriveTrain {
     trainNumber: map['numeroTreno'].toString(),
     category: map['categoria'].toString(),
     departureStationCode: map['codOrigine'].toString(),
-    departureStationName: map['destinazione'].toString(),
+    departureStationName: map['origine'].toString(),
   );
 
 }
