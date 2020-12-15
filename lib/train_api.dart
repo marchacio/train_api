@@ -103,6 +103,8 @@ class TrainApi {
       
       Map trainDetails = json.decode(trainDetailsRaw.body);
 
+      //print(trainDetails['fermate']);
+
       List<StationDetails> stationsDetails = List.generate(trainDetails['fermate'].length, (index) {
         Map _details = trainDetails['fermate'][index];
 
@@ -110,14 +112,14 @@ class TrainApi {
           id: _details['id'],
           name: _details['stazione'],
           realArrive: (_details['arrivoReale'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['arrivoReale']) : null,
-          scheduledArrive: (_details['arrivoTeorico'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['arrivoTeorico']) : null,
+          scheduledArrive: (_details['arrivo_teorico'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['arrivo_teorico']) : null,
           arrivalRealBinary: _details['binarioEffettivoArrivoDescrizione'],
           departureRealBinary: _details['binarioEffettivoPartenzaDescrizione'],
           arrivalScheduledBinary: _details['binarioProgrammatoArrivoDescrizione'],
           departureScheduledBinary: _details['binarioProgrammatoPartenzaDescrizione'],
           stationNumberOfTrainRoute: _details['numeroStazioneDelTreno'],
           realDeparture: (_details['partenzaReale'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['partenzaReale']) : null,
-          scheduledDeparture:(_details['partenzaTeorica'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['partenzaTeorica']) : null,
+          scheduledDeparture:(_details['partenza_teorica'] != null) ? DateTime.fromMicrosecondsSinceEpoch(_details['partenza_teorica']) : null,
           delayArrive: _details['ritardoArrivo'],
           delayDeparture: _details['ritardoPartenza'],
         );
@@ -129,11 +131,13 @@ class TrainApi {
         detailedStationList: stationsDetails,
       );
 
+      print(details.detailedStationList[3].scheduledArrive);
+
       return details;
 
     } catch (e) {
       print(e);
-      print('Error during json.decode: most of the time this means that the train id does not match any real train.\nCheck the train ID');
+      print('Error during json.decode: most of the time this means that the train id does not match any real train.\n\nCheck the train ID\n\n');
       return null;
     }
   }

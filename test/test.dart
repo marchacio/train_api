@@ -6,7 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   
   test('test', () async {
+    //Train train = Train(trainNumber: '511');
 
-    await TrainApi.getArriveStationListTrains(null);
+    //await TrainApi.getTrainDetails(train);
   });
 }
